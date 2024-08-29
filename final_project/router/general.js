@@ -6,13 +6,14 @@ const public_users = express.Router();
 
 
 
-public_users.post("/register", (req,res) => {
+public_users.post("/register", async (req,res) => {
     const username = req.body.username;
     const password = req.body.password;
 
     // Check if both username and password are provided
     if (username && password) {
 
+      await new Promise(resolve => {
         let userswithsamename = users.filter((user) => {
             return user.username === username;
         });
@@ -25,6 +26,7 @@ public_users.post("/register", (req,res) => {
         } else {
             return res.status(404).json({message: "User already exists!"});
         }
+    });
     }
     // Return error if username or password is missing
     return res.status(404).json({message: "Unable to register user."});
@@ -36,26 +38,33 @@ public_users.get('/',function (req, res) {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn', async function (req, res) {
   const isbn = req.params.isbn;
-  book = books[isbn];
-  res.send(book);
+  await new Promise(resolve => {
+    book = books[isbn];
+    res.send(book);
+  });
+
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
   const author = req.params.author;
-  Object.values(books)
+  await new Promise(resolve => {
+    Object.values(books)
     .filter((i) => i.author === author)
     .forEach((i) => res.send(i));
+  });
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
   const title = req.params.title;
-  Object.values(books)
+  await new Promise(resolve => {
+    Object.values(books)
     .filter((i) => i.title === title)
     .forEach((i) => res.send(i));
+  });
 });
 
 //  Get book review
